@@ -3,7 +3,7 @@ import pandas as pd
 from collections import defaultdict
 
 # ===== 🔑 你每天只改這裡 =====
-CUSTOM_PASSWORD = "0906"   # ← 每天改這個就好
+CUSTOM_PASSWORD = "733558"   # ← 每天改這個就好
 
 # ===== 基本設定 =====
 st.set_page_config(
@@ -35,7 +35,7 @@ if password != CUSTOM_PASSWORD:
 st.success("✅ 驗證成功")
 
 # ===== 📲 導流 =====
-st.markdown("👉 [加入LINE取得每日密碼](https://line.me/你的連結)")
+st.markdown("👉 [加入telegram取得每日密碼](https://t.me/big5138)")
 
 # ===== 輸入 =====
 raw_text = st.text_area("📊 貼上歷史資料（每行10個號碼）", height=200)
