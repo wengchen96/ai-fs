@@ -100,3 +100,29 @@ if st.button("開始分析"):
     # ===== 推薦號碼 =====
     best_num = sorted_result[0][0]
     st.success(f"🔥 最推薦號碼：{best_num} （0=10）")
+
+st.set_page_config(
+    page_title="AI名次預測",
+    page_icon="🎯",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+# 隱藏多餘UI
+hide_menu = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+</style>
+"""
+st.markdown(hide_menu, unsafe_allow_html=True)
+
+import datetime
+
+today = datetime.datetime.now().strftime("%Y%m%d")
+password = st.text_input("輸入今日密碼", type="password")
+
+if password != today:
+    st.warning(f"今日密碼錯誤")
+    st.stop()
