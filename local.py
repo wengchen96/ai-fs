@@ -29,7 +29,7 @@ st.markdown("### 🔒 請輸入今日密碼")
 password = st.text_input("密碼", type="password")
 
 if password != CUSTOM_PASSWORD:
-    st.warning("❌ 密碼錯誤（請至LINE取得）")
+    st.warning("❌ 密碼錯誤（請至telegram取得）")
     st.stop()
 
 st.success("✅ 驗證成功")
