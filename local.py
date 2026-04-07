@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from collections import defaultdict
+import random
 
 # ===== 🔑 每日手動密碼 =====
 CUSTOM_PASSWORD = "0407"
@@ -39,6 +40,9 @@ raw_text = st.text_area("📊 請貼入歷史資料（每列10個號碼）", hei
 
 pred_rank = st.slider("🎯 選擇預測名次", 1, 10, 1)
 
+# ===== 🎲 隨機碼數選擇 =====
+random_count = st.slider("🎲 隨機預測碼數", 1, 10, 3)
+
 # ===== 分析 =====
 if st.button("開始分析"):
 
@@ -58,9 +62,9 @@ if st.button("開始分析"):
     N = len(DATA)
 
     # ===== 區段統計 =====
-    front_counts = defaultdict(int)   # 1~5
-    middle_counts = defaultdict(int)  # 3~8
-    back_counts = defaultdict(int)    # 6~10
+    front_counts = defaultdict(int)
+    middle_counts = defaultdict(int)
+    back_counts = defaultdict(int)
 
     for row in DATA:
         for i, num in enumerate(row):
@@ -71,7 +75,6 @@ if st.button("開始分析"):
             if i >= 5:
                 back_counts[num] += 1
 
-    # ===== 轉百分比 =====
     def calc_percent(count_dict):
         return {
             num: round(count_dict.get(num, 0) / N * 100, 2)
@@ -89,21 +92,18 @@ if st.button("開始分析"):
 
     with col1:
         st.markdown("**前段 (1~5名)**")
-        df_front = pd.DataFrame(sorted(front_percent.items(), key=lambda x:-x[1]),
-                                columns=["號碼(0=10)", "%"])
-        st.dataframe(df_front)
+        st.dataframe(pd.DataFrame(sorted(front_percent.items(), key=lambda x:-x[1]),
+                                 columns=["號碼(0=10)", "%"]))
 
     with col2:
         st.markdown("**中段 (3~8名)**")
-        df_middle = pd.DataFrame(sorted(middle_percent.items(), key=lambda x:-x[1]),
-                                 columns=["號碼(0=10)", "%"])
-        st.dataframe(df_middle)
+        st.dataframe(pd.DataFrame(sorted(middle_percent.items(), key=lambda x:-x[1]),
+                                 columns=["號碼(0=10)", "%"]))
 
     with col3:
         st.markdown("**後段 (6~10名)**")
-        df_back = pd.DataFrame(sorted(back_percent.items(), key=lambda x:-x[1]),
-                               columns=["號碼(0=10)", "%"])
-        st.dataframe(df_back)
+        st.dataframe(pd.DataFrame(sorted(back_percent.items(), key=lambda x:-x[1]),
+                                 columns=["號碼(0=10)", "%"]))
 
     # ===== 名次預測 =====
     POSITION_WEIGHTS = {
@@ -125,11 +125,9 @@ if st.button("開始分析"):
         for num in range(10)
     }
 
-    # ===== 取前6名 =====
     top6 = sorted(rank_percent.items(), key=lambda x:-x[1])[:6]
     df_pred = pd.DataFrame(top6, columns=["號碼(0=10)", "機率(%)"])
 
-    # ===== 顯示預測 =====
     st.subheader(f"🎯 第 {pred_rank} 名預測（前6名）")
 
     col1, col2 = st.columns(2)
@@ -140,3 +138,13 @@ if st.button("開始分析"):
     with col2:
         best_num = top6[0][0]
         st.metric("🔥 最推薦號碼", f"{best_num} (0=10)")
+
+    # ===== 🎲 隨機預測 =====
+    st.subheader("🎲 隨機預測結果")
+
+    rand_rank = random.randint(1, 10)
+    rand_nums = random.sample(range(10), random_count)
+
+    rand_nums_str = ",".join(str(n) for n in rand_nums)
+
+    st.success(f"預測結果：第{rand_rank}名 {rand_nums_str}")
