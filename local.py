@@ -40,7 +40,6 @@ raw_text = st.text_area("📊 請貼入歷史資料（每列10個號碼）", hei
 
 pred_rank = st.slider("🎯 選擇預測名次", 1, 10, 1)
 
-# ===== 碼數選擇 =====
 pick_count = st.slider("🎯 預測碼數", 1, 10, 3)
 
 # ===== 開始分析 =====
@@ -61,16 +60,36 @@ if st.button("開始分析"):
 
     N = len(DATA)
 
-    # ===== 🎲 預測結果（先顯示）=====
+    # ===== 🎯 隨機名次（但號碼有邏輯）=====
     rand_rank = random.randint(1, 10)
-    rand_nums = random.sample(range(10), pick_count)
+    idx = rand_rank - 1
 
-    # 排序（0當10）
-    rand_nums_sorted = sorted(rand_nums, key=lambda x: 10 if x == 0 else x)
-    rand_nums_str = ",".join(str(n) for n in rand_nums_sorted)
+    rank_counts = defaultdict(int)
 
+    for row in DATA:
+        rank_counts[row[idx]] += 1
+
+    # ===== 排序（熱 → 冷）=====
+    sorted_nums = sorted(rank_counts.items(), key=lambda x: -x[1])
+    hot_nums = [num for num, _ in sorted_nums[:5]]
+    cold_nums = [num for num, _ in sorted_nums[5:]]
+
+    # ===== 分配比例 =====
+    hot_n = int(pick_count * 0.7)
+    cold_n = pick_count - hot_n
+
+    hot_pick = random.sample(hot_nums, min(hot_n, len(hot_nums)))
+    cold_pick = random.sample(cold_nums, min(cold_n, len(cold_nums)))
+
+    final_nums = hot_pick + cold_pick
+
+    # ===== 排序（0當10）=====
+    final_nums_sorted = sorted(final_nums, key=lambda x: 10 if x == 0 else x)
+    final_str = ",".join(str(n) for n in final_nums_sorted)
+
+    # ===== 顯示預測結果 =====
     st.subheader("🎯 預測結果")
-    st.success(f"預測結果：第{rand_rank}名 {rand_nums_str}")
+    st.success(f"預測結果：第{rand_rank}名 {final_str}")
 
     # ===== 名次預測 =====
     POSITION_WEIGHTS = {
@@ -130,7 +149,7 @@ if st.button("開始分析"):
     middle_percent = calc_percent(middle_counts)
     back_percent = calc_percent(back_counts)
 
-    # ===== 區段顯示（最後）=====
+    # ===== 區段顯示 =====
     st.subheader("📊 區段機率分析")
 
     col1, col2, col3 = st.columns(3)
